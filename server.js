@@ -17,19 +17,6 @@ const pool = new Pool({
   port: 5433,             // your port (default is 5432)
 });
 
-// Example API: get all villages
-app.get("/villages", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT name, ST_AsGeoJSON(geom) as geom FROM villages"
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Database error");
-  }
-});
-
 // Example API: get all assets
 app.get("/assets", async (req, res) => {
   try {
@@ -77,7 +64,7 @@ app.get("/districts", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT district, state_Igd, ST_AsGeoJSON(geom) as geom FROM district_boundary"
+      "SELECT district, state_Igd, ST_AsGeoJSON(ST_Transform(geom, 4326)) AS geom FROM district_boundary"
     );
     res.json(result.rows);
   } catch (err) {
@@ -85,6 +72,25 @@ app.get("/districts", async (req, res) => {
     res.status(500).send("Database error");
   }
 });
+
+// Get villages by district name
+app.get("/districts/:districtName/villages", async (req, res) => {
+  const { districtName } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT id, name
+       FROM villages
+       WHERE UPPER(addressstate_district) = UPPER($1)`,  // ✅ normalize case
+      [districtName]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching villages:", err);
+    res.status(500).send("Database error");
+  }
+});
+
+
 
 
 
