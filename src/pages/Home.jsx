@@ -1,27 +1,33 @@
-import React from 'react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Login from '../components/Login';
+import FRAClaimCard from '../components/FRAClaimCard';
+import ApprovedTitlesCard from '../components/ApprovedTitlesCard';
+import PendingVerificationCard from '../components/PendingVerificationCard';
+import SchemesLinkedCard from '../components/SchemesLinkedCard';
+import StatesCoveredCard from '../components/StatesCoveredCard';
+import VillagesMappedCard from '../components/VillagesMappedCard';
+import MapComponent from '../components/MapComponent';
+import ButtonMenu from '../components/ButtonMenu';
 
 
-function Home(){
-    const [showPopup, setShowPopup]=useState(false);
-    return(
+const Home = () => {
+    return (
         <div>
-            <div className='login'>
-              <button onClick={()=> setShowPopup(true)}>Login</button>
-              {showPopup && (
-                <Login onClose={()=> setShowPopup(false)}>
-                </Login>
-              )}
-            </div>
-            <div className='dashboard'>
-                <Link to="/dashboard">
-                    <button>Go to Dashboard</button>
-                </Link>
-            </div>
+                {/* Responsive grid for cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+                  <FRAClaimCard />
+                  <ApprovedTitlesCard />
+                  <PendingVerificationCard />
+                  <SchemesLinkedCard />
+                  <StatesCoveredCard />
+                  <VillagesMappedCard />
+                </div>
+
+                {/* Map */}
+                <MapComponent />
+
+                {/* Button Menu */}
+                <ButtonMenu />
         </div>
-    )
+    );
 }
 
 export default Home;
