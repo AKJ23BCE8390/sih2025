@@ -1,0 +1,14 @@
+
+.cards{
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
+.map-container {
+    margin-top: 20px;
+}
+
+.cards{
+    margin-top: 20px;
+}

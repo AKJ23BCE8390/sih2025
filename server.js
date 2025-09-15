@@ -1,0 +1,93 @@
+import express from "express";
+import pkg from "pg";
+import cors from "cors";
+
+const { Pool } = pkg;
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// PostgreSQL connection pool
+const pool = new Pool({
+  user: "postgres",       // your username
+  host: "localhost",      // or your server IP
+  database: "sih",        // your db name
+  password: "15484519",   // your password
+  port: 5433,             // your port (default is 5432)
+});
+
+// Example API: get all villages
+app.get("/villages", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT name, ST_AsGeoJSON(geom) as geom FROM villages"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Database error");
+  }
+});
+
+// Example API: get all assets
+app.get("/assets", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT type, name, ST_AsGeoJSON(geom) as geom FROM assets"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Database error");
+  }
+});
+
+// Get all states
+// Get all states
+app.get("/states", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT gid, state_name, ST_AsGeoJSON(ST_Transform(geom, 4326)) as geom FROM india_state_boundary"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Database error");
+  }
+});
+
+app.get("/states/:stateId/districts", async (req, res) => {
+  const { stateId } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT gid, district, ST_AsGeoJSON(geom) as geom FROM district_boundary WHERE state_id = $1",
+      [stateId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+
+});
+
+
+app.get("/districts", async (req, res) => {
+
+  try {
+    const result = await pool.query(
+      "SELECT district, state_Igd, ST_AsGeoJSON(geom) as geom FROM district_boundary"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Database error");
+  }
+});
+
+
+
+
+const PORT = 5000;
+app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
